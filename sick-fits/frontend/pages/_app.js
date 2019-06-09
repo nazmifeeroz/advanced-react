@@ -1,10 +1,12 @@
 import { Container } from 'next/app'
+import Page from '../components/Page'
 
 const MyApp = ({ Component }) => {
   return (
     <Container>
-      <p>true?</p>
-      <Component />
+      <Page>
+        <Component />
+      </Page>
     </Container>
   )
 }
