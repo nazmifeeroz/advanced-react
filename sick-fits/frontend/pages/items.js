@@ -1,11 +1,11 @@
 import Items from '../components/Items'
 
-const Home = () => {
+const Shop = () => {
   return (
     <div>
-      <p>hey!</p>
+      <Items />
     </div>
   )
 }
 
-export default Home
+export default Shop
