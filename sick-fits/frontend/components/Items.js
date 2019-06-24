@@ -1,5 +1,5 @@
 import React from 'react'
-import { Query } from 'react-apollo'
+import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import styled from 'styled-components'
 import Item from './Item'
@@ -29,23 +29,20 @@ const ItemsList = styled.div`
   margin: 0 auto;
 `
 
-export default () => {
+const Items = ({ loading, error, data }) => {
   return (
     <Center>
       <p>Items!</p>
-      <Query query={ALL_ITEMS_QUERY}>
-        {({ data, error, loading }) => {
-          if (loading) return <p>loading...</p>
-          if (error) return <p>Error: {error.message}</p>
-          return (
-            <ItemsList>
-              {data.items.map(item => (
-                <Item item={item} key={item.id} />
-              ))}
-            </ItemsList>
-          )
-        }}
-      </Query>
+      {loading && <p>loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      <ItemsList>
+        {data.items.map(item => (
+          <Item item={item} key={item.id} />
+        ))}
+      </ItemsList>
+      }
     </Center>
   )
 }
+
+export default graphql(ALL_ITEMS_QUERY)(Items)
