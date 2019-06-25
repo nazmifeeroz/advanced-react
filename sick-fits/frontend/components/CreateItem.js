@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Mutation } from 'react-apollo'
+import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Router from 'next/router'
 import Form from './styles/Form'
@@ -26,7 +26,9 @@ export const CREATE_ITEM_MUTATION = gql`
   }
 `
 
-export default () => {
+const CreateItem = props => {
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState(null)
   const [formData, setFormData] = useState({
     title: 'cool',
     description: 'default desc',
@@ -39,62 +41,63 @@ export default () => {
     setFormData({ ...formData, [name]: value })
   }
   return (
-    <Mutation mutation={CREATE_ITEM_MUTATION} variables={formData}>
-      {(createItem, { loading, error }) => (
-        <Form
-          onSubmit={async e => {
-            e.preventDefault()
-            const {
-              data: {
-                createItem: { id },
-              },
-            } = await createItem()
+    <Form
+      onSubmit={async e => {
+        e.preventDefault()
+        setLoading(true)
+        props
+          .mutate({ variables: formData })
+          .then(({ data: { createItem: { id } } }) => {
             Router.push({
               pathname: '/item',
               query: { id },
             })
-          }}
-        >
-          <Error error={error} />
-          <fieldset disabled={loading} aria-busy={loading}>
-            <label htmlFor="title">
-              Title
-              <input
-                type="text"
-                id="title"
-                name="title"
-                placeholder="Title"
-                required
-                value={formData.title}
-                onChange={handleInputChange}
-              />
-            </label>
-            <label htmlFor="price">
-              Price
-              <input
-                type="number"
-                id="price"
-                name="price"
-                required
-                value={formData.price}
-                onChange={handleInputChange}
-              />
-            </label>
-            <label htmlFor="description">
-              Description
-              <textarea
-                id="description"
-                name="description"
-                placeholder="Enter A Description"
-                required
-                value={formData.description}
-                onChange={handleInputChange}
-              />
-            </label>
-            <button type="submi">Submit</button>
-          </fieldset>
-        </Form>
-      )}
-    </Mutation>
+          })
+          .catch(error => {
+            setErrors(error)
+            setLoading(false)
+          })
+      }}
+    >
+      <Error error={errors} />
+      <fieldset disabled={loading} aria-busy={loading}>
+        <label htmlFor="title">
+          Title
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="Title"
+            value={formData.title}
+            onChange={handleInputChange}
+          />
+        </label>
+        <label htmlFor="price">
+          Price
+          <input
+            type="number"
+            id="price"
+            name="price"
+            required
+            value={formData.price}
+            onChange={handleInputChange}
+          />
+        </label>
+        <label htmlFor="description">
+          Description
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Enter A Description"
+            required
+            value={formData.description}
+            onChange={handleInputChange}
+          />
+        </label>
+        <button type="submi">Submit</button>
+      </fieldset>
+    </Form>
   )
 }
+
+export default graphql(CREATE_ITEM_MUTATION)(CreateItem)
