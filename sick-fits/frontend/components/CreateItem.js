@@ -94,7 +94,7 @@ const CreateItem = props => {
             onChange={handleInputChange}
           />
         </label>
-        <button type="submi">Submit</button>
+        <button type="submit">Submit</button>
       </fieldset>
     </Form>
   )
